@@ -38,4 +38,8 @@ dependencies {
 
     //include for using GSON
     implementation 'com.google.code.gson:gson:2.8.5'
+
+    //include for using JSoup
+    implementation 'org.jsoup:jsoup:1.11.3'
+
 }

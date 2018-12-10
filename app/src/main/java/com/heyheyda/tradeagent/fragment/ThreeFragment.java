@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.heyheyda.tradeagent.Main2Activity;
@@ -25,16 +26,32 @@ import com.heyheyda.tradeagent.R;
 import com.heyheyda.tradeagent.data.EmptyRealTimeStockInfo;
 import com.heyheyda.tradeagent.data.RealTimeStockInfo;
 import com.heyheyda.tradeagent.util.DialogManager;
+import com.heyheyda.tradeagent.util.Log;
 import com.heyheyda.tradeagent.util.StockInfoAgent;
 import com.heyheyda.tradeagent.widget.RealTimeStockItem;
 import com.heyheyda.tradeagent.widget.RecyclerAdapter;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ThreeFragment extends Fragment {
 
+    private interface OnSymbolRetrieveListener {
+
+        void onSymbolRetrieveSuccess(String symbol);
+
+        void onSymbolRetrieveFailed();
+    }
+
+    private final String TAG = "TF";
+
     private View fragmentView;
+    private ProgressBar progressBar;
     private RecyclerAdapter recyclerAdapter;
     private BroadcastReceiver broadcastReceiver;
     private StockInfoAgent stockInfoAgent;
@@ -150,19 +167,56 @@ public class ThreeFragment extends Fragment {
                 dialogManager.setDialogClickListener(DialogManager.ListenerType.POSITIVE, new DialogManager.ClickListener() {
                     @Override
                     public void onClick() {
-                        String symbol = dialogManager.getStringResult(DialogManager.DialogResult.STRING_DIALOG_MESSAGE_INPUT);
-                        if (symbol != null) {
-                            stockSymbolList.add(symbol);
+                        final String input = dialogManager.getStringResult(DialogManager.DialogResult.STRING_DIALOG_MESSAGE_INPUT);
+                        if (input != null) {
+                            symbolRetriever(input, new OnSymbolRetrieveListener() {
+                                @Override
+                                public void onSymbolRetrieveSuccess(final String symbol) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                stockSymbolList.add(symbol);
 
-                            //save stock symbol list
-                            saveStockSymbolList();
+                                                //save stock symbol list
+                                                saveStockSymbolList();
 
-                            //display on list
-                            displayStockInfo();
-                            refreshStockSummaryInfo();
+                                                //display on list
+                                                displayStockInfo();
+                                                refreshStockSummaryInfo();
 
-                            //request data to refresh list content
-                            requestStockInfo();
+                                                //request data to refresh list content
+                                                requestStockInfo();
+                                            }
+                                        });
+                                    }
+                                }
+
+                                @Override
+                                public void onSymbolRetrieveFailed() {
+                                    // TODO: show dialog & add input as symbol
+                                    Log.e(TAG, "onSymbolRetrieveFailed.");
+
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                stockSymbolList.add(input);
+
+                                                //save stock symbol list
+                                                saveStockSymbolList();
+
+                                                //display on list
+                                                displayStockInfo();
+                                                refreshStockSummaryInfo();
+
+                                                //request data to refresh list content
+                                                requestStockInfo();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -179,6 +233,93 @@ public class ThreeFragment extends Fragment {
         for (String symbol : stockSymbolList) {
             stockInfoAgent.requestRealTimeStockInfo(symbol, fragmentView.getContext());
         }
+    }
+
+    private void symbolRetriever(final String input, final OnSymbolRetrieveListener listener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final String GOOGLE_SEARCH_URL_FORMAT = "https://www.google.com/search?q=stock+%s";
+                final String SYMBOL_QUERY = "g-card-section g-card-section span";
+                final int SYMBOL_POSITION = 0;
+                final String SYMBOL_SEPARATOR = ": ";
+                final String TW_MARKET = "TPE";
+                final String HK_MARKET = "HKG";
+                final String JP_MARKET = "TYO";
+                final String KR_MARKET = "KRX";
+                final String TW_MARKET_SYMBOL_TAIL = ".TW";
+                final String HK_MARKET_SYMBOL_TAIL = ".HK";
+                final String JP_MARKET_SYMBOL_TAIL = ".T";
+                final String KR_MARKET_SYMBOL_TAIL = ".KS";
+
+                String googleSearchUrlString = String.format(GOOGLE_SEARCH_URL_FORMAT, input);
+                try {
+                    Log.d(TAG, "symbolRetriever: url: " + googleSearchUrlString);
+                    Document doc = Jsoup.connect(googleSearchUrlString).get();
+                    Log.d(TAG, "symbolRetriever: title: " + doc.title());
+                    Elements elements = doc.select(SYMBOL_QUERY);
+                    if (elements.size() > 0) {
+                        String[] result = elements.get(SYMBOL_POSITION).ownText().split(SYMBOL_SEPARATOR);
+
+                        if (result.length == 2) {
+                            String market = result[0];
+                            String symbol = result[1];
+                            Log.e(TAG, "market: " + market + ", " + "symbol: " + symbol);
+
+                            //fix symbol of tw market
+                            switch (market) {
+                                case TW_MARKET:
+                                    symbol += TW_MARKET_SYMBOL_TAIL;
+                                    break;
+                                case HK_MARKET:
+                                    symbol += HK_MARKET_SYMBOL_TAIL;
+                                    break;
+                                case JP_MARKET:
+                                    symbol += JP_MARKET_SYMBOL_TAIL;
+                                    break;
+                                case KR_MARKET:
+                                    symbol += KR_MARKET_SYMBOL_TAIL;
+                                    break;
+                            }
+
+                            listener.onSymbolRetrieveSuccess(symbol);
+
+                            //stop progress bar
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                });
+                            }
+                            return;
+                        } else {
+                            Log.d(TAG, "symbolRetriever: invalid symbol format.");
+                        }
+                    } else {
+                        Log.d(TAG, "symbolRetriever: stock not found.");
+                    }
+                } catch (IOException e) {
+                    Log.printStackTrace(e);
+                }
+
+                listener.onSymbolRetrieveFailed();
+
+                //stop progress bar
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+                }
+            }
+        }).start();
+
+        //start progress bar
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -257,15 +398,14 @@ public class ThreeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_three, container, false);
+
+        progressBar = fragmentView.findViewById(R.id.progressBar);
         recyclerAdapter = new RecyclerAdapter();
         stockInfoAgent = StockInfoAgent.getInstance(fragmentView.getContext());
         stockSymbolList = new ArrayList<>();
 
         initialStockInfoList();
         initialAddStockButton();
-
-        // TODO: need to add mechanism to remove stocks
-        //-- TODO: maybe use edit mode
 
         // TODO: need to add alert when no internet (or info cant get)
 

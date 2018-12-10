@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launch icon -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+
+    <!-- Main theme -->
+    <color name="colorPrimary">#125688</color>
+    <color name="colorPrimaryDark">#125688</color>
+    <color name="colorAccent">#9F9F9F</color>
+
+    <!-- Custom color -->
+    <color name="colorAccentDarkGray">#777777</color>
+
+    <!-- Tab -->
+    <color name="colorTabText">#FFFFFF</color>
+
+    <!-- Fragment -->
+    <color name="colorFragmentBackground">#FFFFFF</color>
+
+    <!-- List -->
+    <color name="colorListBackground">#FFFFFF</color>
+
+    <!-- Chart -->
+    <color name="colorChartDataRed">#FFD23F31</color>
+    <color name="colorChartDataRedTransparent">#00D23F31</color>
+
+    <!-- not check usage -->
+    <!-- tool bar -->
+    <color name="colorEditModeToolBar">#808080</color>
+
+    <!-- stock item adapter -->
+    <color name="colorStockPrice">#505050</color>
+    <color name="colorStatusIncrease">#3DA942</color>
+    <color name="colorStatusDecrease">#E00000</color>
+    <color name="colorStatusNone">#505050</color>
+
+    <!-- Original color of main theme. -->
+    <!--
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    -->
+</resources>

@@ -1,0 +1,71 @@
+<resources>
+    <string name="app_name">Trade Agent</string>
+
+    <!-- dialog -->
+    <string name="dialog_button_default_text_positive">YES</string>
+    <string name="dialog_button_default_text_neutral">Cancel</string>
+    <string name="dialog_button_default_text_negative">NO</string>
+    <string name="dialog_button_default_text_ok">OK</string>
+    <string name="dialog_skip_hint_default_text">Do not show again.</string>
+
+    <!-- real-time stock info -->
+    <string name="title_real_time_stock_info">Real-Time Stock Info</string>
+    <plurals name="record_count">
+        <item quantity="one">%d Record</item>
+        <item quantity="other">%d Records</item>
+    </plurals>
+
+    <!-- history stock info -->
+    <string name="history_info_range_1d">1 day</string>
+    <string name="history_info_range_5d">5 days</string>
+    <string name="history_info_range_1m">1 month</string>
+    <string name="history_info_range_6m">6 months</string>
+    <string name="history_info_range_ytd">YTD</string>
+    <string name="history_info_range_1y">1 year</string>
+    <string name="history_info_range_5y">5 years</string>
+    <string name="history_info_range_max">Max</string>
+
+    <!-- chart label -->
+    <string name="chart_label_close">Close Price</string>
+    <string name="chart_label_vol">Volume</string>
+
+    <!-- edit mode -->
+    <string name="edit_mode_tip">Select Items</string>
+    <string name="edit_mode_tip_count">%d Selected</string>
+    <plurals name="dialog_message_text_delete">
+        <item quantity="one">Are you sure you want to delete selected item?</item>
+        <item quantity="other">Are you sure you want to delete selected items?</item>
+    </plurals>
+
+
+    <!-- not check usage -->
+    <!-- MainActivity -->
+    <string name="toolbar_button_title_check">Check/Un-Check All</string>
+    <string name="toolbar_button_title_up">Move Up</string>
+    <string name="toolbar_button_title_down">Move Down</string>
+    <string name="toolbar_button_title_delete">Delete</string>
+    <string name="toolbar_button_title_add">Add</string>
+    <string name="dialog_title_add">Add to watchlist</string>
+    <string name="dialog_message_add">Click ACCEPT to add stock.</string>
+    <string name="dialog_message_delete">Are you sure you want to delete selected item%s?</string>
+    <string name="dialog_button_ok">OK</string>
+    <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_hint_add">(Stock name/symbol)</string>
+    <string name="button_description_cancel">Cancel Button</string>
+    <string name="toast_message_add_failed">%s is already in your watchlist.</string>
+    <string name="tab_name_watchlist">My Watchlist</string>
+
+    <!-- Main2Activity -->
+    <string name="stock_info_label_pre_close">Previous Close</string>
+    <string name="stock_info_label_open">Open</string>
+    <string name="stock_info_label_high">Day High</string>
+    <string name="stock_info_label_low">Day Low</string>
+    <string name="stock_info_label_vol">Volume</string>
+
+    <!-- dialog -->
+    <string name="dialog_hint_message_rescan">You can press back to scan again.</string>
+
+    <!-- Common -->
+    <string name="tab_description" translatable="false">Icon tab</string>
+    <string name="item_image_description" translatable="false">Item Image</string>
+</resources>
