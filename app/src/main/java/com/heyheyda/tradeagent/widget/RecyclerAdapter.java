@@ -122,21 +122,31 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         return this.idList.get(position);
     }
 
+    /**
+     * viewType is same value as LayoutResource
+     */
     @NonNull
     @Override
-    public RecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        ViewItem item = this.itemList.get(i);
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(item.getLayoutResource(), parent, false);
+    public RecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
 
         return new RecyclerAdapter.ViewHolder(itemView);
     }
 
+    /**
+     * return LayoutResource as viewType
+     */
     @Override
-    public void onBindViewHolder(@NonNull RecyclerAdapter.ViewHolder viewHolder, int i) {
+    public int getItemViewType(int position) {
+        return this.itemList.get(position).getLayoutResource();
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerAdapter.ViewHolder viewHolder, int position) {
         //set view contents
-        ViewItem item = this.itemList.get(i);
+        ViewItem item = this.itemList.get(position);
         if (item != null) {
-            item.draw(viewHolder.itemView, isSelectedList.get(i));
+            item.draw(viewHolder.itemView, isSelectedList.get(position));
         }
 
         //set click listener

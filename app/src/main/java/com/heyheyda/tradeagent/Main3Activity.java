@@ -88,7 +88,7 @@ public class Main3Activity extends AppCompatActivity {
 
                 //reverse the selection state of item
                 recyclerAdapter.setItemSelect(position, !recyclerAdapter.isItemSelected(position));
-                recyclerAdapter.notifyDataSetChanged();
+                recyclerAdapter.notifyItemChanged(position);
 
                 refreshNumberOfSelectedItems();
                 refreshAccessibilityOfToolBarItems();

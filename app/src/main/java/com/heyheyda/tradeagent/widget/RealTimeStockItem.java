@@ -16,33 +16,25 @@ import java.util.TimeZone;
 
 public class RealTimeStockItem implements RecyclerAdapter.ViewItem {
 
-    private Context context;
     private RealTimeStockInfo realTimeStockInfo;
+    private String nameString;
+    private String timeString;
+    private String priceString;
+    private String changeString;
+    private int changeColor;
 
     public RealTimeStockItem(@NonNull RealTimeStockInfo realTimeStockInfo, @NonNull Context context) {
         this.realTimeStockInfo = realTimeStockInfo;
-        this.context = context;
+        initialStringsAndColors(context);
     }
 
-    @Override
-    public int getLayoutResource() {
-        return R.layout.real_time_stock_item;
-    }
-
-    @Override
-    public void draw(View view, boolean isSelected) {
-        final String NULL_MARK=" - ";
-
-//        final String MARKET_STRING="%s";
-        final String NAME_STRING="%s (%s)";
-        final String TIME_STRING="(%s)";
-        final String PRICE_STRING="%.2f";
-        final String CHANGE_STRING="%.2f (%.2f%%)";
-
-        TextView txtView01 = view.findViewById(R.id.text1);
-        TextView txtView02 = view.findViewById(R.id.text2);
-        TextView txtView03 = view.findViewById(R.id.text3);
-        TextView txtView04 = view.findViewById(R.id.text4);
+    private void initialStringsAndColors(Context context) {
+        final String NULL_MARK = " - ";
+        final String NAME_STRING_FORMAT = "%s (%s)";
+        final String TIME_STRING_FORMAT = "(%s)";
+        final String PRICE_STRING_FORMAT = "%.2f";
+        final String CHANGE_STRING_FORMAT = "%.2f (%.2f%%)";
+        final String DATE_PATTERN = "MMM dd HH:mm";
 
         //get info
         String name = realTimeStockInfo.getName();
@@ -58,20 +50,24 @@ public class RealTimeStockItem implements RecyclerAdapter.ViewItem {
         double changePercent = realTimeStockInfo.getChangePercent();
 
         //get time
-        String timeString;
-        Date time = realTimeStockInfo.getTime();
+        String time;
+        Date datetime = realTimeStockInfo.getTime();
         TimeZone timeZone = realTimeStockInfo.getTimeZone();
-        if (time != null && timeZone != null) {
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm z", Locale.getDefault());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm", Locale.getDefault());
+        if (datetime != null && timeZone != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.getDefault());
             dateFormat.setTimeZone(timeZone);
-            timeString = dateFormat.format(time);
+            time = dateFormat.format(datetime);
         } else {
-            timeString = NULL_MARK;
+            time = NULL_MARK;
         }
 
-        //get color
-        int changeColor;
+        //set strings
+        nameString = String.format(NAME_STRING_FORMAT, name, symbol);
+        timeString = String.format(TIME_STRING_FORMAT, time);
+        priceString = String.format(Locale.getDefault(), PRICE_STRING_FORMAT, price);
+        changeString = String.format(Locale.getDefault(), CHANGE_STRING_FORMAT, change, changePercent);
+
+        //set color
         if (change > 0) {
             changeColor = ContextCompat.getColor(context, R.color.colorStatusIncrease);
         } else if (change < 0) {
@@ -79,12 +75,25 @@ public class RealTimeStockItem implements RecyclerAdapter.ViewItem {
         } else {
             changeColor = ContextCompat.getColor(context, R.color.colorStatusNone);
         }
+    }
+
+    @Override
+    public int getLayoutResource() {
+        return R.layout.real_time_stock_item;
+    }
+
+    @Override
+    public void draw(View view, boolean isSelected) {
+        TextView txtView01 = view.findViewById(R.id.text1);
+        TextView txtView02 = view.findViewById(R.id.text2);
+        TextView txtView03 = view.findViewById(R.id.text3);
+        TextView txtView04 = view.findViewById(R.id.text4);
 
         //set text
-        txtView01.setText(String.format(NAME_STRING, name, symbol));
-        txtView02.setText(String.format(TIME_STRING, timeString));
-        txtView03.setText(String.format(Locale.getDefault(), PRICE_STRING, price));
-        txtView04.setText(String.format(Locale.getDefault(), CHANGE_STRING, change, changePercent));
+        txtView01.setText(nameString);
+        txtView02.setText(timeString);
+        txtView03.setText(priceString);
+        txtView04.setText(changeString);
         txtView04.setTextColor(changeColor);
     }
 }
