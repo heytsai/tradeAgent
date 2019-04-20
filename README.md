@@ -1,6 +1,9 @@
 
 ## Trade Agent
-Under development, "Watch List" feature is completed.
+1. Can use stock symbol or company name to add stocks of interest.
+2. Graphically display stock prices for different time periods.
+
+Lib used: MPChart, JSoup.
 
 ## Preview
 <img width="30%" align="left" src="https://raw.githubusercontent.com/heytsai/tradeAgent/master/preview/watch_list.png" />
